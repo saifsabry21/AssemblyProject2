@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\AssemblyProject2"
+    "\\AssemblyProject2",
+    "\\AssemblyProject2\\AssemblyProject2"
   ],
-  "SelectedNode": "\\AssemblyProject2\\AssemblyProject2.sln",
+  "SelectedNode": "\\AssemblyProject2\\AssemblyProject2\\AssemblyProject2.vcxproj.user",
   "PreviewInSolutionExplorer": false
 }
