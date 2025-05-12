@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <vector>
 using namespace std;
 #define DBG 1
 #define DRAM_SIZE (64*1024*1024)
@@ -52,13 +53,53 @@ cacheResType cacheSimDM(unsigned int addr)
 	//transaction is a miss
 		return MISS;
 }
+struct CacheLineFA {
+	unsigned int tag = 0;
+	bool valid = false;
+	unsigned int leastrecentuseCounter = 0;
+};
 // Fully Associative Cache Simulator
 cacheResType cacheSimFA(unsigned int addr)
 {
-	// This function accepts the memory address for the read and
-	// returns whether it caused a cache miss or a cache hit
-	// The current implementation assumes there is no cache; so, every
-	//transaction is a miss
+	static unsigned int lineSize = 64;
+	static unsigned int cacheLines = CACHE_SIZE / lineSize;
+	static CacheLineFA* cache = new CacheLineFA[cacheLines]{};
+	static unsigned int accessCount = 0;
+
+	unsigned int tag = addr / lineSize;
+	// Check for hit
+	bool hit = false;
+	int hitIndex = -1;
+
+	for (int i = 0; i < cacheLines; ++i) {
+		if (cache[i].valid && cache[i].tag == tag) {
+			hit = true;
+			hitIndex = i;
+			break;
+		}
+	}
+	if (hit) {
+		cache[hitIndex].leastrecentuseCounter = ++accessCount;
+		return HIT;
+	}
+	// Miss
+	unsigned int lruValue = UINT_MAX;
+	int lruIndex = 0;
+
+	for (int i = 0; i < cacheLines; ++i) {
+		if (!cache[i].valid) { // Prioritize invalid entries
+			lruIndex = i;
+			break;
+		}
+		if (cache[i].leastrecentuseCounter < lruValue) {
+			lruValue = cache[i].leastrecentuseCounter;
+			lruIndex = i;
+		}
+	}
+	// Replace entry
+	cache[lruIndex].tag = tag;
+	cache[lruIndex].valid = true;
+	cache[lruIndex].leastrecentuseCounter = ++accessCount;
 		return MISS;
 }
 const char* msg[2] = { "Miss","Hit" };
@@ -78,4 +119,6 @@ int main()
 			<< ")\n";
 	}
 	cout << "Hit ratio = " << (100 * hit / NO_OF_Iterations) << endl;
+	return 0;
 }
+
