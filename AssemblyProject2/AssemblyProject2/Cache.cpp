@@ -15,6 +15,7 @@ static unsigned int   FaLineSize = 64;
 static unsigned int FaCacheLines = CACHE_SIZE / FaLineSize;
 static CacheLineFA* FaCache = new CacheLineFA[FaCacheLines]{};
 static unsigned int   FaAccessCount = 0;
+static unsigned int NumSets = 4;
 
 /* The following implements a random number generator */
 unsigned int m_w = 0xABABAB55; /* must not be zero, nor 0x464fffff */
@@ -64,7 +65,7 @@ cacheResType cacheSimDM(unsigned int addr)
 		return MISS;
 }
 
-// Fully Associative Cache Simulator
+ // Fully Associative Cache Simulator
 cacheResType cacheSimFA(unsigned int addr)
 {
 	unsigned int lineSize = FaLineSize;
@@ -108,6 +109,45 @@ cacheResType cacheSimFA(unsigned int addr)
 	cache[lruIndex].leastrecentuseCounter = ++accessCount;
 		return MISS;
 }
+// Set associative simulator
+cacheResType cacheSimSA(unsigned int addr)
+{
+	unsigned int block = addr / FaLineSize;
+	unsigned int setindex = block % NumSets;
+	unsigned int tag = block / NumSets;
+	unsigned int ways = FaCacheLines / NumSets;
+	unsigned int base = setindex * ways;
+
+	// Check for hit
+	for (unsigned i = 0; i < ways; ++i) {
+		CacheLineFA& ln = FaCache[base + i];
+		if (ln.valid && ln.tag == tag) {
+			ln.leastrecentuseCounter = ++FaAccessCount;
+			return HIT;
+		}
+	}
+	//choose invalid slot or LRU
+	unsigned int candidate = base;
+	unsigned int leastUsed = UINT_MAX;
+	for (unsigned i = 0; i < ways; ++i) {
+		CacheLineFA& ln = FaCache[base + i];
+		if (!ln.valid) {
+			candidate = base + i;
+			break;
+		}
+		if (ln.leastrecentuseCounter < leastUsed) {
+			leastUsed = ln.leastrecentuseCounter;
+			candidate = base + i;
+		}
+	}
+
+	//add new line
+	CacheLineFA& line = FaCache[candidate];
+	line.valid = true;
+	line.tag = tag;
+	line.leastrecentuseCounter = ++FaAccessCount;
+	return MISS;
+}
 // Re‑initialize the FA cache for new line size
 void resetFACache(unsigned int newLineSize) {
 	FaLineSize = newLineSize;
@@ -117,19 +157,28 @@ void resetFACache(unsigned int newLineSize) {
 	delete[] FaCache;
 	FaCache = new CacheLineFA[FaCacheLines]();
 }
+void resetSACache(unsigned int newLineSize, unsigned int newNumSets) {
+	FaLineSize = newLineSize;
+	FaCacheLines = CACHE_SIZE / FaLineSize;
+	FaAccessCount = 0;
+	NumSets = newNumSets;
+
+	delete[] FaCache;
+	FaCache = new CacheLineFA[FaCacheLines]();
+}
 
 
 const char* msg[2] = { "Miss","Hit" };
-#define NO_OF_Iterations 100 // CHange to 1,000,000
+#define NO_OF_Iterations 1000000 // CHange to 1,000,000
 int main()
 {
 	const unsigned int sizes[] = { 16, 32, 64, 128 };
 	const unsigned int SetNum = 4;
 
-	cout << "Experiment 1 for FACacheSim: 4 sets, varying line size"<<endl;
+	cout << "FACacheSim Experiment 1: 4 sets, varying line size"<<endl;
 
 	for (unsigned int L : sizes) {
-		resetFACache(L);
+		resetSACache(L,4);
 
 	unsigned int totalLines = CACHE_SIZE / L;
 	unsigned int ways = totalLines / SetNum;
@@ -139,8 +188,8 @@ int main()
 
 		unsigned long long hits = 0;
 		for (unsigned long long i = 0; i < NO_OF_Iterations; ++i) {
-			unsigned int addr = memGen2();
-			cacheResType r = cacheSimFA(addr);
+			unsigned int addr = memGen5();
+			cacheResType r = cacheSimSA(addr);
 			if (r == HIT) {
 				hits++;
 			}
@@ -153,7 +202,29 @@ int main()
 		cout << dec << "Hit ratio = " << fixed << setprecision(3) << ratio << "%" << endl;
 	}
 	cout << endl;
+	FaLineSize = 64; 
+	const unsigned int WaysSet[] = { 1, 2, 4, 8, 16, 32, 64 };
+	cout << "FACache Experiment 2: Fixed Line Size (64) and varying ways:" << endl;
+	for (unsigned int wayCount : WaysSet) {
+		resetSACache(FaLineSize,wayCount);
 
+		unsigned int totalLines = CACHE_SIZE / FaLineSize;
+		unsigned int ways = totalLines / wayCount;
+
+		cout <<"Number of Lines: "<<FaLineSize<< " Bytes, Number of Sets = " << wayCount << ", Ways = " << ways << endl;
+
+		unsigned long long hits1 = 0;
+		for (unsigned long long i = 0; i < NO_OF_Iterations; i++) {
+			unsigned int addr1 = memGen3();
+			cacheResType r1 = cacheSimSA(addr1);
+			if (r1 == HIT) {
+				hits1++;
+			}
+		}
+		double ratio1 = 100.0 * hits1 / NO_OF_Iterations;
+		cout << "Hit ratio = " << fixed << setprecision(3) << ratio1 << "%" << endl;
+
+	}
 	// cleanup
 	delete[] FaCache;
 	return 0;

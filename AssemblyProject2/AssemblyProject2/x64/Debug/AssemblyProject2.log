@@ -1,4 +1,4 @@
 ﻿  Cache.cpp
-C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(80,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(95,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(81,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(96,20): warning C4018: '<': signed/unsigned mismatch
   AssemblyProject2.vcxproj -> C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\x64\Debug\AssemblyProject2.exe
