@@ -1,4 +1,8 @@
 ﻿  Cache.cpp
-C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(81,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(96,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(62,13): warning C4566: character represented by universal-character-name '\u202F' cannot be represented in the current code page (1252)
+C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(64,13): warning C4566: character represented by universal-character-name '\u202F' cannot be represented in the current code page (1252)
+C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(65,13): warning C4566: character represented by universal-character-name '\u202F' cannot be represented in the current code page (1252)
+C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(66,13): warning C4566: character represented by universal-character-name '\u202F' cannot be represented in the current code page (1252)
+C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(91,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\AssemblyProject2\Cache.cpp(106,20): warning C4018: '<': signed/unsigned mismatch
   AssemblyProject2.vcxproj -> C:\Users\Saifs\Documents\AssemblyProject2\AssemblyProject2\x64\Debug\AssemblyProject2.exe

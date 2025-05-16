@@ -10,6 +10,7 @@ struct CacheLineFA {
 	bool valid = false;
 	unsigned int leastrecentuseCounter = 0;
 };
+
 enum cacheResType { MISS = 0, HIT = 1 };
 static unsigned int   FaLineSize = 64;
 static unsigned int FaCacheLines = CACHE_SIZE / FaLineSize;
@@ -55,6 +56,15 @@ unsigned int memGen6()
 	static unsigned int addr = 0;
 	return (addr += 32) % (64 * 4 * 1024);
 }
+struct GenFunction { unsigned int (*fn)(); const char* name; };
+GenFunction Funct[] = {
+	{ memGen1, "memGen1 (sequential full DRAM)"},
+	{ memGen2, "memGen2 (24 KiB random)" },
+	{ memGen3, "memGen3 (global random)" },
+	{ memGen4, "memGen4 (4 KiB sequential)" },
+	{ memGen5, "memGen5 (64 KiB sequential)"},
+	{ memGen6, "memGen6 (stride=32 over 64 KiB)"},
+};
 // Direct Mapped Cache Simulator
 cacheResType cacheSimDM(unsigned int addr)
 {
@@ -174,58 +184,81 @@ int main()
 {
 	const unsigned int sizes[] = { 16, 32, 64, 128 };
 	const unsigned int SetNum = 4;
-
-	cout << "FACacheSim Experiment 1: 4 sets, varying line size"<<endl;
-
-	for (unsigned int L : sizes) {
-		resetSACache(L,4);
-
-	unsigned int totalLines = CACHE_SIZE / L;
-	unsigned int ways = totalLines / SetNum;
-
-		cout << "Line size = " << L << " bytes, Ways = " << ways << "\n";
-		//cout << "Address (Miss/Hit)\n";
-
-		unsigned long long hits = 0;
-		for (unsigned long long i = 0; i < NO_OF_Iterations; ++i) {
-			unsigned int addr = memGen5();
-			cacheResType r = cacheSimSA(addr);
-			if (r == HIT) {
-				hits++;
-			}
-
-			//cout << "0x"
-				//<< setfill('0') << setw(8) << hex << addr
-				//<< " (" << msg[r] << ")\n";
-		}
-		double ratio = 100.0 * hits / NO_OF_Iterations;
-		cout << dec << "Hit ratio = " << fixed << setprecision(3) << ratio << "%" << endl;
-	}
-	cout << endl;
-	FaLineSize = 64; 
 	const unsigned int WaysSet[] = { 1, 2, 4, 8, 16, 32, 64 };
-	cout << "FACache Experiment 2: Fixed Line Size (64) and varying ways:" << endl;
-	for (unsigned int wayCount : WaysSet) {
-		resetSACache(FaLineSize,wayCount);
 
-		unsigned int totalLines = CACHE_SIZE / FaLineSize;
-		unsigned int ways = totalLines / wayCount;
+	for (int gen = 1; gen <= 6; ++gen) {
 
-		cout <<"Number of Lines: "<<FaLineSize<< " Bytes, Number of Sets = " << wayCount << ", Ways = " << ways << endl;
+		cout << " Generator memGen" << gen << endl;
 
-		unsigned long long hits1 = 0;
-		for (unsigned long long i = 0; i < NO_OF_Iterations; i++) {
-			unsigned int addr1 = memGen3();
-			cacheResType r1 = cacheSimSA(addr1);
-			if (r1 == HIT) {
-				hits1++;
+		// Experiment 1 
+		cout << "FACacheSim Experiment 1: 4 sets, varying line size"<<endl;
+		for (unsigned int L : sizes) {
+			resetSACache(L, SetNum);
+
+			unsigned int totalLines = CACHE_SIZE / L;
+			unsigned int ways = totalLines / SetNum;
+
+			cout << "Line size = " << L << " bytes, Ways = " << ways << endl;
+
+			unsigned long long hits = 0;
+			for (unsigned long long i = 0; i < NO_OF_Iterations; ++i) {
+				unsigned int addr;
+				switch (gen) {
+				case 1: addr = memGen1(); break;
+				case 2: addr = memGen2(); break;
+				case 3: addr = memGen3(); break;
+				case 4: addr = memGen4(); break;
+				case 5: addr = memGen5(); break;
+				case 6: addr = memGen6(); break;
+				}
+				if (cacheSimSA(addr) == HIT) {
+					hits++;
+				}
 			}
+			double ratio = 100.0 * hits / NO_OF_Iterations;
+			cout << dec
+				<< "Hit ratio = "
+				<< fixed << setprecision(3)
+				<< ratio << "%" << endl;
 		}
-		double ratio1 = 100.0 * hits1 / NO_OF_Iterations;
-		cout << "Hit ratio = " << fixed << setprecision(3) << ratio1 << "%" << endl;
 
+		cout << endl;
+
+		//Experiment 2
+		FaLineSize = 64;
+		cout << "FACache Experiment 2: Fixed Line Size (64) and varying ways:"<<endl;
+		for (unsigned int wayCount : WaysSet) {
+			resetSACache(FaLineSize, wayCount);
+
+			unsigned int totalLines = CACHE_SIZE / FaLineSize;
+			unsigned int ways = totalLines / wayCount;
+
+			cout << "Number of Lines: " << FaLineSize
+				<< " Bytes, Number of Sets = " << wayCount
+				<< ", Ways = " << ways << endl;
+
+			unsigned long long hits1 = 0;
+			for (unsigned long long i = 0; i < NO_OF_Iterations; ++i) {
+				unsigned int addr1;
+				switch (gen) {
+				case 1: addr1 = memGen1(); break;
+				case 2: addr1 = memGen2(); break;
+				case 3: addr1 = memGen3(); break;
+				case 4: addr1 = memGen4(); break;
+				case 5: addr1 = memGen5(); break;
+				case 6: addr1 = memGen6(); break;
+				}
+				if (cacheSimSA(addr1) == HIT) {
+					hits1++;
+				}
+			}
+			double ratio1 = 100.0 * hits1 / NO_OF_Iterations;
+			cout << "Hit ratio = "
+				<< fixed << setprecision(3)
+				<< ratio1 << "%" << endl;
+		}
 	}
-	// cleanup
+
 	delete[] FaCache;
 	return 0;
 }

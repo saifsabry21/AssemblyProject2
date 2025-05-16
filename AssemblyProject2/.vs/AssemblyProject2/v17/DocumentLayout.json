@@ -5,10 +5,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{F1CDCF3B-E81F-4D5D-B139-19F588DC627B}|AssemblyProject2\\AssemblyProject2.vcxproj|C:\\Users\\Saifs\\Documents\\AssemblyProject2\\AssemblyProject2\\AssemblyProject2\\Cache.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F1CDCF3B-E81F-4D5D-B139-19F588DC627B}|AssemblyProject2\\AssemblyProject2.vcxproj|solutionrelative:AssemblyProject2\\Cache.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7C02059A-9D53-4F3B-9C21-092E987B3415}|Solution Items{7C02059A-9D53-4F3B-9C21-092E987B3415}|C:\\Users\\Saifs\\Documents\\AssemblyProject2\\AssemblyProject2\\.gitignore.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{7C02059A-9D53-4F3B-9C21-092E987B3415}|Solution Items{7C02059A-9D53-4F3B-9C21-092E987B3415}|solutionrelative:.gitignore.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -28,22 +24,10 @@
               "RelativeDocumentMoniker": "AssemblyProject2\\Cache.cpp",
               "ToolTip": "C:\\Users\\Saifs\\Documents\\AssemblyProject2\\AssemblyProject2\\AssemblyProject2\\Cache.cpp",
               "RelativeToolTip": "AssemblyProject2\\Cache.cpp",
-              "ViewState": "AQIAANUAAAAAAAAAAAAAAKEAAAAoAAAA",
+              "ViewState": "AQIAAMUAAAAAAAAAAAAAAN8AAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-05-12T18:36:32.248Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": ".gitignore.txt",
-              "DocumentMoniker": "C:\\Users\\Saifs\\Documents\\AssemblyProject2\\AssemblyProject2\\.gitignore.txt",
-              "RelativeDocumentMoniker": ".gitignore.txt",
-              "ToolTip": "C:\\Users\\Saifs\\Documents\\AssemblyProject2\\AssemblyProject2\\.gitignore.txt",
-              "RelativeToolTip": ".gitignore.txt",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAEAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-05-12T18:30:02.651Z"
             }
           ]
         }
