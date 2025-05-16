@@ -17,6 +17,7 @@ static unsigned int FaCacheLines = CACHE_SIZE / FaLineSize;
 static CacheLineFA* FaCache = new CacheLineFA[FaCacheLines]{};
 static unsigned int   FaAccessCount = 0;
 static unsigned int NumSets = 4;
+#define NO_OF_Iterations 1000000 // CHange to 1,000,000
 
 /* The following implements a random number generator */
 unsigned int m_w = 0xABABAB55; /* must not be zero, nor 0x464fffff */
@@ -179,18 +180,108 @@ void resetSACache(unsigned int newLineSize, unsigned int newNumSets) {
 
 
 const char* msg[2] = { "Miss","Hit" };
-#define NO_OF_Iterations 1000000 // CHange to 1,000,000
-int main()
-{
+void FASATestCases() {
+	cout << "Test 1: Fully Associative Cache with 3 lines. 4 Addresses A, B, C, and D"<<endl;
+	resetSACache(64, 1);
+	FaCacheLines = 3;
+	delete[] FaCache;
+	FaCache = new CacheLineFA[3]();
+
+	unsigned int a = 0x0000;
+	unsigned int b = 0x0040; 
+	unsigned int c = 0x0080;
+	unsigned int d = 0x00C0; 
+
+	cout << "Expected Values for Test1: MISS, MISS, MISS, HIT, HIT, MISS (evict C as it is LRU), MISS (c was evicted) " << endl;
+
+	cout << "Access A (0x0000): " << msg[cacheSimSA(a)] << endl;
+	cout << "Access B (0x0040): " << msg[cacheSimSA(b)] << endl;
+	cout << "Access C (0x0080): " << msg[cacheSimSA(c)] << endl;
+	cout << "Access A again:     " << msg[cacheSimSA(a)] << endl;
+	cout << "Access B again:     " << msg[cacheSimSA(b)] << endl;
+	cout << "Access D (0x00C0): " << msg[cacheSimSA(d)] << endl;
+	cout << "Access C again:     " << msg[cacheSimSA(c)] << endl;
+
+	cout << "Test 2: 2 sets with 2 lines per set and 3 addresses: addr0,addr2,addr4" << endl;
+	resetSACache(64, 2);
+	FaCacheLines = 4;
+	delete[] FaCache;
+	FaCache = new CacheLineFA[4]();
+
+	unsigned int addr0 = 0x0000;
+	unsigned int addr2 = 0x0080;
+	unsigned int addr4 = 0x0100;
+
+	cout << "Expected Value for Test 2: MISS,MISS,HIT,HIT,MISS,MISS" << endl;
+
+	cout << "Access addr0 (0x0000): " << msg[cacheSimSA(addr0)] << endl;
+	cout << "Access addr2 (0x0080): " << msg[cacheSimSA(addr2)] << endl;
+	cout << "Access addr0 again:    " << msg[cacheSimSA(addr0)] << endl;
+	cout << "Access addr2 again:    " << msg[cacheSimSA(addr2)] << endl; 
+	cout << "Access addr4 (0x0100): " << msg[cacheSimSA(addr4)] << endl;  
+	cout << "Access addr0 again:    " << msg[cacheSimSA(addr0)] << endl; 
+
+	cout << "Test 3: Repeated Access to Same Address"<<endl;
+	cout << "Expected: MISS, HIT, HIT, HIT"<<endl;
+
+	resetSACache(64, 1);
+	FaCacheLines = 1;
+	delete[] FaCache;
+	FaCache = new CacheLineFA[1]();
+
+	unsigned int addr = 0x0000;
+
+	cout << "1) Access addr: " << msg[cacheSimSA(addr)] << endl;
+	cout << "2) Access addr: " << msg[cacheSimSA(addr)] << endl;
+	cout << "3) Access addr: " << msg[cacheSimSA(addr)] << endl;
+	cout << "4) Access addr: " << msg[cacheSimSA(addr)] << endl;
+
+	cout << "Test 4: Independent Sets Dont collide"<<endl;
+	cout << "Expected: MISS, MISS, HIT (set 0), HIT (set 1)\n";
+
+	resetSACache(64, 2);
+	FaCacheLines = 4;
+	delete[] FaCache;
+	FaCache = new CacheLineFA[4]();
+
+	unsigned int set0 = 0x0000; // set 0
+	unsigned int set1 = 0x0040; // set 1
+
+	cout << "1) Access set0: " << msg[cacheSimSA(set0)] << endl;
+	cout << "2) Access set1: " << msg[cacheSimSA(set1)] << endl;
+	cout << "3) Access set0: " << msg[cacheSimSA(set0)] << endl;
+	cout << "4) Access set1: " << msg[cacheSimSA(set1)] << endl;
+
+	cout << "Test 5: LRU Inside a Set" << endl;
+	cout << "Expected: MISS, MISS, HIT, MISS (evict oldest), MISS (evicted)\n";
+
+	resetSACache(64, 2);
+	FaCacheLines = 4;
+	delete[] FaCache;
+	FaCache = new CacheLineFA[4]();
+
+	unsigned int x = 0x0000;
+	unsigned int y = 0x0080;
+	unsigned int z = 0x0100;
+
+	cout << "1) Access x: " << msg[cacheSimSA(x)] << endl;
+	cout << "2) Access y: " << msg[cacheSimSA(y)] << endl;
+	cout << "3) Access x: " << msg[cacheSimSA(x)] << endl;
+	cout << "4) Access z: " << msg[cacheSimSA(z)] << endl;
+	cout << "5) Access y: " << msg[cacheSimSA(y)] << endl;
+
+}
+void datacollectionSA() {
+	cout << " Data Collection for SACacheSim: " << "\n\n\n";
+
 	const unsigned int sizes[] = { 16, 32, 64, 128 };
 	const unsigned int SetNum = 4;
 	const unsigned int WaysSet[] = { 1, 2, 4, 8, 16, 32, 64 };
-
 	for (int gen = 1; gen <= 6; ++gen) {
 
 		cout << " Generator memGen" << gen << endl;
 
-		// Experiment 1 
+		// Experiment 1
 		cout << "FACacheSim Experiment 1: 4 sets, varying line size"<<endl;
 		for (unsigned int L : sizes) {
 			resetSACache(L, SetNum);
@@ -260,5 +351,11 @@ int main()
 	}
 
 	delete[] FaCache;
+}
+
+int main()
+{
+	FASATestCases();
+	datacollectionSA();
 	return 0;
 }
