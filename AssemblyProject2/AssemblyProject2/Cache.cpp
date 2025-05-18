@@ -69,12 +69,25 @@ GenFunction Funct[] = {
 // Direct Mapped Cache Simulator
 cacheResType cacheSimDM(unsigned int addr)
 {
-	// This function accepts the memory address for the memory transaction and
-	// returns whether it caused a cache miss or a cache hit
-	// The current implementation assumes there is no cache; so, every
-	//transaction is a miss
+	static const unsigned int lineSize = 64;                      // 64-byte lines
+	static const unsigned int numLines = CACHE_SIZE / lineSize;  // 1024 lines
+	static CacheLineFA* dmCache = new CacheLineFA[numLines];     // One line per index
+
+	unsigned int blockAddr = addr / lineSize;       // Get block number
+	unsigned int index = blockAddr % numLines;      // Cache index (direct mapped)
+	unsigned int tag = blockAddr / numLines;        // Tag
+
+	CacheLineFA& line = dmCache[index];
+
+	if (line.valid && line.tag == tag) {
+		return HIT;
+	} else {
+		line.valid = true;
+		line.tag = tag;
 		return MISS;
+	}
 }
+
 
  // Fully Associative Cache Simulator
 cacheResType cacheSimFA(unsigned int addr)
