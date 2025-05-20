@@ -57,25 +57,17 @@ unsigned int memGen6()
 	static unsigned int addr = 0;
 	return (addr += 32) % (64 * 4 * 1024);
 }
-struct GenFunction { unsigned int (*fn)(); const char* name; };
-GenFunction Funct[] = {
-	{ memGen1, "memGen1 (sequential full DRAM)"},
-	{ memGen2, "memGen2 (24 KiB random)" },
-	{ memGen3, "memGen3 (global random)" },
-	{ memGen4, "memGen4 (4 KiB sequential)" },
-	{ memGen5, "memGen5 (64 KiB sequential)"},
-	{ memGen6, "memGen6 (stride=32 over 64 KiB)"},
-};
+
 // Direct Mapped Cache Simulator
 cacheResType cacheSimDM(unsigned int addr)
 {
-	static const unsigned int lineSize = 64;                      // 64-byte lines
-	static const unsigned int numLines = CACHE_SIZE / lineSize;  // 1024 lines
-	static CacheLineFA* dmCache = new CacheLineFA[numLines];     // One line per index
+	static const unsigned int lineSize = 64;
+	static const unsigned int numLines = CACHE_SIZE / lineSize; 
+	static CacheLineFA* dmCache = new CacheLineFA[numLines];
 
-	unsigned int blockAddr = addr / lineSize;       // Get block number
-	unsigned int index = blockAddr % numLines;      // Cache index (direct mapped)
-	unsigned int tag = blockAddr / numLines;        // Tag
+	unsigned int blockAddr = addr / lineSize; 
+	unsigned int index = blockAddr % numLines;
+	unsigned int tag = blockAddr / numLines;
 
 	CacheLineFA& line = dmCache[index];
 
